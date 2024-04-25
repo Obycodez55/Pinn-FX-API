@@ -1,0 +1,23 @@
+{
+  "name": "pinn-fx-api",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "env-cmd -f ./.env nodemon app.js",
+    "start": "node app.js"
+  },
+  "author": "Obycodez55",
+  "license": "MIT",
+  "description": "API for a mobile app for forex transactions",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "env-cmd": "^10.1.0",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.3.2",
+    "validator": "^13.11.0"
+  }
+}
