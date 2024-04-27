@@ -1,8 +1,13 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const Account = require("./Account");
 
-const { isEmail, isValidDate, isValidPhone } = "../providers/dbValidator.js";
+const {
+  isEmail,
+  isValidDate,
+  isValidPhone
+} = require("../providers/dbValidator.js");
+const hashPassword = require("../helpers/hashPassword.js");
 
 const Schema = mongoose.Schema;
 const AccountSchema = new Schema(
@@ -19,7 +24,8 @@ const AccountSchema = new Schema(
       type: String,
       lowercase: true,
       required: true,
-      validate: isEmail(value)
+      unique: true,
+      validate: (value) => isEmail(value)
     },
     password: {
       type: String,
@@ -29,42 +35,55 @@ const AccountSchema = new Schema(
     },
     dateOfBirth: {
       type: Date,
-      validate: isValidDate(value)
+      validate: (value) => isValidDate(value)
     },
     phoneNumber: {
       type: String,
       trim: true,
-      validate: isValidPhone(value)
+      unique: true,
+      validate: (value) => isValidPhone(value)
     },
     balance: {
       type: mongoose.Types.Decimal128,
       default: 0.0
     },
-    tokens: [
-      {
-        token: {
-          type: String,
-          required: true
-        }
-      }
-    ],
+    token: {
+      type: String,
+      required: true
+    },
     linkedAccounts: {
-        type: [mongoose.Types.ObjectId],
-        ref: "Linked_account"
+      type: [mongoose.Types.ObjectId],
+      ref: "Linked_account"
+    },
+    lastLogin: {
+      type: Date,
+      default: Date.now()
     }
   },
   { timestamps: true }
 );
 
 AccountSchema.pre("save", async function (next) {
-    const account = this;
-    if (account.isNew || account.isModified("password")){
-        try {
-        account.password = bcrypt.hash(account.password, process.env.BCRYPT_SALT);
-        } catch (error) {
-            console.log(error)
-            throw new Error({error: error.message})
-        }
+  const account = this;
+  if (account.isModified("password")) {
+    try {
+      account.password = await hashPassword(account.password);
+    } catch (error) {
+      console.log(error);
+      throw new Error({ error: error.message });
     }
+  }
+  next();
 });
+
+// AccountSchema.methods.isCorrectedPassword = function (password, callback) {
+//   bcrypt.compare(password, this.password, function (err, same) {
+//     if (err) {
+//       callback(err);
+//     } else {
+//       callback(err, same);
+//     }
+//   });
+// };
+
 module.exports = mongoose.model("Account", AccountSchema);
