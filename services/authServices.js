@@ -3,10 +3,9 @@ const getToken = require("../providers/GetToken.js");
 
 const stripAccount = require("../helpers/stripDoc.js");
 const findByCredentials = require("../providers/findByCredentials.js");
-const getErrorType = require("../helpers/getErrorType.js");
-const getReqData = require("../helpers/getReqData.js");
-const { findByEmail } = require("../providers/dbQuery.js");
+const { findByEmail, createDetails } = require("../providers/dbProviders.js");
 const hashPassword = require("../helpers/hashPassword.js");
+const errorHandler = require("../middlewares/errorHandler.js");
 
 async function createAccount(res, req) {
   try {
@@ -14,24 +13,18 @@ async function createAccount(res, req) {
 
     const account = new Account(newData);
     const token = getToken(account.email);
+    const detailId = await createDetails(account.id);
     account.token = token;
+    account.details = detailId;
     await account.save();
     stripAccount(account); // TODO: work on striping the data before sending it
     return res.status(201).send({ account });
   } catch (error) {
-    if (error.code === 11000) {
-      return res
-        .status(409)
-        .send({
-          error: `Duplicate account! ${getErrorType(error)} already exists`
-        });
-    }
-    return res.status(500).send({ error });
+    return errorHandler(error, req, res);
   }
 }
 
 async function authenticate(res, req) {
-  
   const newData = req.body || req.query;
   try {
     const { email, password } = newData;
@@ -46,7 +39,7 @@ async function authenticate(res, req) {
     stripAccount(account);
     return res.status(200).send({ account });
   } catch (error) {
-    return res.status(400).send({ error });
+    return res.status(401).send(error.message);
   }
 }
 
@@ -54,25 +47,16 @@ async function update(res, req) {
   const update = req.body || req.query;
 
   try {
-    if(update.password){
+    if (update.password) {
       update.password = await hashPassword(update.password);
     }
     await Account.findByIdAndUpdate(req.account.id, update);
+
     const account = await findByEmail(Account, req.account.email);
-    stripAccount(account);
+    // stripAccount(account);
     return res.status(200).send({ account });
   } catch (error) {
-    if (error.code === 11000) {
-      return res
-        .status(409)
-        .send({
-          error: `Duplicate account! ${getErrorType(error)} already exists`
-        });
-    }
-    else{
-      return res.status(500).send({ error });
-    }
-    
+    return errorHandler(error, req, res);
   }
 }
 

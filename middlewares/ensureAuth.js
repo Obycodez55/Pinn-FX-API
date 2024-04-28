@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Account = require("../models/Account");
-const { getByEmail, findByEmail } = require("../providers/dbQuery");
+const { getByEmail, findByEmail } = require("../providers/dbProviders");
 
 module.exports = async function (req, res, next) {
   const token =

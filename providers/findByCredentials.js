@@ -1,21 +1,21 @@
 const bcrypt = require("bcryptjs");
 const Account = require("../models/Account");
-const { findByEmail } = require("../providers/dbQuery");
+const { findByEmail } = require("./dbProviders");
 
 module.exports = async (email, password) => {
   
 try {
   const account = await findByEmail(Account, email);
   if (!account) {
-    throw new Error({ error: "Invalid Login Credentials" });
+    throw new Error("Invalid Login Credentials" );
   }
   const isPasswordMatch = bcrypt.compare(password, account.password);
   if (!isPasswordMatch) {
-  throw new Error({ error: "Invalid Login Credentials" });
+  throw new Error("Invalid Login Credentials");
   }
   return account;
 } catch (error) {
-  throw new Error({ error: error.message }); // TODO: handle the validation errors properly
+  throw new Error(error.message ); // TODO: handle the validation errors properly
 }
 };
 

@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const Account = require("./Account");
 
 const {
   isEmail,
@@ -43,9 +41,13 @@ const AccountSchema = new Schema(
       unique: true,
       validate: (value) => isValidPhone(value)
     },
-    balance: {
-      type: mongoose.Types.Decimal128,
-      default: 0.0
+    verify: {
+      type: Boolean,
+      default: false
+    },
+    details: {
+      type: mongoose.Types.ObjectId,
+      ref: "Account_details"
     },
     token: {
       type: String,
