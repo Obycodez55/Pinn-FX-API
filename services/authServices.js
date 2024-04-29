@@ -26,6 +26,7 @@ async function createAccount(req, res, next) {
     console.log({newAccount: account, token: token});
     account.token = token;
     account.details = detailId;
+    console.log(account);
     const newaccount = await account.save();
     console.log({created: newaccount});
     stripAccount(account); // TODO: work on striping the data before sending it,,,,
