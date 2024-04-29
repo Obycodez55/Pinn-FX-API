@@ -5,7 +5,7 @@ const { findAccountByEmail } = require("./dbProviders");
 module.exports = async (email, password) => {
   
 try {
-  const account = await findAccountByEmail(Account, email);
+  const account = await findAccountByEmail(email);
   if (!account) {
     throw new Error("Invalid Login Credentials" );
   }
