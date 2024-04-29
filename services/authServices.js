@@ -18,7 +18,7 @@ const sendEmail = require("../Utils/email.js");
 async function createAccount(req, res, next) {
   try {
     const newData = req.body || req.query;
-
+    console.log(newData);
     const account = new Account(newData);
     const token = getToken(account.email);
     const detailId = await createDetails(account.id);
