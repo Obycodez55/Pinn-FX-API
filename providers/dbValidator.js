@@ -1,8 +1,9 @@
 const validator = require("validator");
+const CustomError = require("../Utils/CustomError");
 
 function isEmail(value) {
   if (!validator.isEmail(value)) {
-    throw new Error("Invalid Email Address" );
+    throw new CustomError("Invalid Email Address", 400);
   }
 }
 
@@ -12,7 +13,7 @@ function isValidDate(value) {
     typeof value != "number" ||
     typeof value != "object"
   ) {
-    throw new Error("Invalid Date");
+    throw new CustomError("Invalid Date", 400);
   }
 
   // Subtract 18 years from now and see if greater than birth date
@@ -23,13 +24,13 @@ function isValidDate(value) {
   if (m != now.getMonth()) now.setDate(0);
 
   if (now > value) {
-    throw new Error("User is less than 18");
+    throw new CustomError("User is less than 18", 400);
   }
 }
 
 function isValidPhone(value) {
     if (!validator.isMobilePhone(value)) {
-        throw new Error("invalid phone number");
+      throw new CustomError("invalid phone number", 400);
     }
 }
 

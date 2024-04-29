@@ -12,12 +12,15 @@
   "description": "API for a mobile app for forex transactions",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "env-cmd": "^10.1.0",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.5.0",
     "mongoose": "^8.3.2",
+    "nodemailer": "^6.9.13",
+    "shortid": "^2.2.16",
     "validator": "^13.11.0"
   }
 }

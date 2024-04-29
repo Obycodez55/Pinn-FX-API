@@ -1,11 +1,11 @@
 const bcrypt = require("bcryptjs");
 const Account = require("../models/Account");
-const { findByEmail } = require("./dbProviders");
+const { findAccountByEmail } = require("./dbProviders");
 
 module.exports = async (email, password) => {
   
 try {
-  const account = await findByEmail(Account, email);
+  const account = await findAccountByEmail(Account, email);
   if (!account) {
     throw new Error("Invalid Login Credentials" );
   }

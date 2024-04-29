@@ -1,21 +1,28 @@
 const AccountDetails = require("../models/Account_details");
+const Account = require("../models/Account");
 
-async function findByEmail(model, email) {
+const crypto = require("crypto");
+const CustomError = require("../Utils/CustomError");
+
+async function findAccountByEmail(email) {
   try {
-    const value = await model.findOne({ email: email });
+    const value = await Account.findOne({ email: email });
     return value;
   } catch (error) {
-    throw new Error({ error: error.message });
+    throw new CustomError(error.message, 500);
   }
 }
 
-async function createDetails(id){
-    try {
-      const details = await AccountDetails.create({accountId: id});
-      return details._id;
-    } catch (error) {
-      throw new Error({ error: error.message });
-    }
+async function createDetails(id) {
+  try {
+    const details = await AccountDetails.create({ accountId: id });
+    return details._id;
+  } catch (error) {
+    throw new CustomError(error.message, 500);
+  }
 }
 
-module.exports = { findByEmail, createDetails };
+module.exports = {
+  findAccountByEmail,
+  createDetails
+};

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Account = require("../models/Account");
-const { getByEmail, findByEmail } = require("../providers/dbProviders");
+const { getByEmail, findAccountByEmail } = require("../providers/dbProviders");
+const CustomError = require("../Utils/CustomError");
 
 module.exports = async function (req, res, next) {
   const token =
@@ -9,21 +10,24 @@ module.exports = async function (req, res, next) {
     req.headers["x-access-token"] ||
     req.cookies.token;
   if (!token) {
-    res.status(401).send("Unauthorized: No token provided");
+    const error = new CustomError("Unauthorized: No token provided", 401);
+    next(error);
   } else {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded) {
-      res.status(401).send("Unauthorized: Invalid token");
+      const error = new CustomError("Unauthorized: Invalid token", 401);
+      next(error);
     } else {
       try {
-        const account = await findByEmail(Account, decoded);
+        const account = await findAccountByEmail(Account, decoded);
         if (!account) {
-          res.status(403).send("account does not exist");
+          const error = new CustomError("Account does not exist", 401);
+          next(error);
         } else {
           req.account = account;
         }
       } catch (error) {
-        res.status(500).send(error.message);
+        next(error);
       }
     }
     next();
@@ -32,11 +36,11 @@ module.exports = async function (req, res, next) {
 
 // module.exports = function(req, res, next){
 //     const token = req.cookies.user_token;
-  
+
 //     if (!token) {
 //       return res.redirect("/user/login");
 //     }
-  
+
 //     try {
 //       const decoded = jwt.verify(token, jwtSecret);
 //       req.userId = decoded.userId;

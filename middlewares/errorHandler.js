@@ -1,13 +1,22 @@
 const getErrorType = require("../helpers/getErrorType");
+const CustomError = require("../Utils/CustomError");
 const errorHandler = (error, req, res, next) => {
-    if (error.code === 11000) {
-        return res
-          .status(409)
-          .send({
-            error: `Duplicate account! ${getErrorType(error)} already exists`
-          });
-      }
-      return res.status(500).send(error);
+  if (error.code === 11000) {
+    error = new CustomError(
+      `Duplicate account! ${getErrorType(error)} already exists`,
+      409
+    );
+  }else
+  if (error._message == "Account validation failed") {
+    console.log("This works");
+    error = new CustomError(error.message, 400);
+  }
+  error.statusCode = error.statusCode || 500;
+  return res.status(error.statusCode).send({
+    status: error.statusCode,
+    message: error.message,
+    error: error
+  });
 };
 
 module.exports = errorHandler;

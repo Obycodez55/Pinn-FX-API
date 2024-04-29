@@ -1,4 +1,6 @@
+const errorHandler = require("../middlewares/errorHandler");
 const AccountDetails = require("../models/Account_details");
+const CustomError = require("../Utils/CustomError");
 
 
 async function getAccountDetails(req, res){
@@ -8,7 +10,8 @@ async function getAccountDetails(req, res){
         const accountDetails = await AccountDetails.findById(accountId);
         return res.send(accountDetails);
     } catch (error) {
-        return res.status(500).send("Internal Server Error")
+        error = new CustomError("Internal Server Error", 500)
+        return errorHandler(error, req, res);
     }  
 }
 
@@ -21,7 +24,8 @@ async function addToBalance(req, res) {
         await AccountDetails.save();
         return res.send(accountDetails);
     } catch (error) {
-        return res.status(500).send("Internal Server Error")
+        error = new CustomError("Internal Server Error", 500)
+        return errorHandler(error, req, res);
     } 
 }
 module.exports = { getAccountDetails, addToBalance }

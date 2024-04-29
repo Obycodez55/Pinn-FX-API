@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const crypto = require("crypto");
+const { JWTTimestamp } = require("jsonwebtoken");
 
 const {
   isEmail,
@@ -60,7 +62,10 @@ const AccountSchema = new Schema(
     lastLogin: {
       type: Date,
       default: Date.now()
-    }
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetTokenExpires: Date
   },
   { timestamps: true }
 );
@@ -72,11 +77,20 @@ AccountSchema.pre("save", async function (next) {
       account.password = await hashPassword(account.password);
     } catch (error) {
       console.log(error);
-      throw new Error({ error: error.message });
+      throw new Error(error.message);
     }
   }
   next();
 });
+
+AccountSchema.methods.generatePasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  this.passwordResetTokenExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
 
 // AccountSchema.methods.isCorrectedPassword = function (password, callback) {
 //   bcrypt.compare(password, this.password, function (err, same) {
