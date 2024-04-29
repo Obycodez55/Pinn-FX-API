@@ -18,20 +18,21 @@ const sendEmail = require("../Utils/email.js");
 async function createAccount(req, res, next) {
   try {
     const newData = req.body || req.query;
-    console.log({body: newData});
+    // console.log({body: newData});
     const account = new Account(newData);
-    console.log({newAccount: account});
+    // console.log({newAccount: account});
     const token = getToken(account.email);
     const detailId = await createDetails(account.id);
-    console.log({newAccount: account, token: token});
+    // console.log({newAccount: account, token: token});
     account.token = token;
     account.details = detailId;
-    console.log(account);
+    // console.log(account);
     const newaccount = await account.save();
-    console.log({created: newaccount});
+    // console.log({created: newaccount});
     stripAccount(account); // TODO: work on striping the data before sending it,,,,
     return res.status(201).send({ statusCode: 201, account });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
