@@ -52,7 +52,6 @@ const AccountSchema = new Schema(
     },
     token: {
       type: String,
-      required: true
     },
     linkedAccounts: {
       type: [mongoose.Types.ObjectId],
