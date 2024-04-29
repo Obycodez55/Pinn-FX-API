@@ -23,9 +23,11 @@ async function createAccount(req, res, next) {
     console.log({newAccount: account});
     const token = getToken(account.email);
     const detailId = await createDetails(account.id);
+    console.log({newAccount: account, token: token});
     account.token = token;
     account.details = detailId;
-    await account.save();
+    const newaccount = await account.save();
+    console.log({created: newaccount});
     stripAccount(account); // TODO: work on striping the data before sending it,,,,
     return res.status(201).send({ statusCode: 201, account });
   } catch (error) {
