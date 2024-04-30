@@ -32,7 +32,6 @@ async function createAccount(req, res, next) {
     stripAccount(account); // TODO: work on striping the data before sending it,,,,
     return res.status(201).send({ statusCode: 201, account });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 }
@@ -90,7 +89,10 @@ async function forgotPassword(req, res, next) {
 
     const resetToken = account.generatePasswordResetToken();
     await account.save();
-    const reset = await Reset_Code.create({ token: resetToken });
+    const reset = new Reset_Code({ token: resetToken });
+    
+    newreset = await reset.save();
+    req.resetCode = reset.resetCode;
     const message = `Reset Code ${reset.resetCode}`;
     try {
       await sendEmail({
@@ -103,23 +105,19 @@ async function forgotPassword(req, res, next) {
         message: "Password reset link sent to the email address"
       });
     } catch (error) {
-      if (error.code == 11000) {
-        await Reset_Code.deleteMany({ resetCode: reset.code });
-        forgotPassword(req, res);
-      }
+     
       account.passwordResetToken = undefined;
       account.passwordResetTokenExpires = undefined;
       account.save();
-      error = new CustomError(
-        "Password reset email not sent, Pls try again later",
-        500
-      );
       next(error);
     }
   } catch (error) {
     console.log(error);
-    error = new CustomError(error.message, 500);
-    return errorHandler(error, req, res);
+    if (error.code == 11000) {
+      await Reset_Code.deleteOne({ resetCode: req.resetCode });
+      forgotPassword(req, res, next);
+    }
+    next(error);
   }
 }
 

@@ -8,7 +8,6 @@ const errorHandler = (error, req, res, next) => {
     );
   }else
   if (error._message == "Account validation failed") {
-    console.log("This works");
     error = new CustomError(error.message, 400);
   }
   error.statusCode = error.statusCode || 500;
