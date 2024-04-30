@@ -42,7 +42,7 @@ async function authenticate(req, res, next) {
     const { email, password } = newData;
     const account = await findByCredentials(email, password);
     if (!account) {
-      const err = new CustomError("Login failed! Check your credentials", 403);
+      const err = new CustomError("Login failed! Check your credentials", 401);
       next(err);
     }
     account.lastLogin = Date.now();
@@ -127,7 +127,7 @@ async function verifyCode(req, res, next) {
     const reset = await Reset_Code.findOne({ resetCode: code });
     if (!reset) {
       const error = new CustomError("Code is Invalid or expired", 400);
-      return errorHandler(error, req, res);
+      next(error);
     }
     const resetToken = reset.token;
     const resetUrl = `${req.protocol}://${req.get(

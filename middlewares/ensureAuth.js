@@ -21,7 +21,7 @@ module.exports = async function (req, res, next) {
       try {
         const account = await findAccountByEmail(Account, decoded);
         if (!account) {
-          const error = new CustomError("Account does not exist", 401);
+          const error = new CustomError("Account does not exist", 404);
           next(error);
         } else {
           req.account = account;
