@@ -51,15 +51,14 @@ async function update(req, res, next) {
   if (update.password) {
     const err = new CustomError("Forbidden request: Can't update Password", 403);
     next(err);
+  }else
+  if(update.email){
+    const token = getToken(update.email);
+    update.token = token;
   };
   try {
     await Account.findByIdAndUpdate(req.account.id, update);
     const account = await Account.findById(req.account.id);
-    if(update.email){
-      const token = getToken(update.email);
-      account.token = token;
-      await account.save();
-    }
     stripAccount(account);
     return res.status(200).send({ statusCode: 200, account });
   } catch (error) {
