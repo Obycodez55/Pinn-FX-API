@@ -15,7 +15,7 @@ async function findAccountByEmail(email) {
 
 async function createDetails(id) {
   try {
-    const details = await AccountDetails.create({ accountId: id, balance: 45000.45});
+    const details = await AccountDetails.create({ accountId: id});
     return details._id;
   } catch (error) {
     throw new CustomError(error.message, 500);
