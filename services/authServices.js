@@ -2,16 +2,12 @@ const Account = require("../models/Account.js");
 const Reset_Code = require("../models/Reset_Code.js");
 const crypto = require("crypto");
 const getToken = require("../providers/GetToken.js");
-const getErrorType = require("../helpers/getErrorType.js");
 const stripAccount = require("../helpers/stripDoc.js");
 const findByCredentials = require("../providers/findByCredentials.js");
 const {
   findAccountByEmail,
-  createDetails,
-  generatePasswordResetToken
+  createDetails
 } = require("../providers/dbProviders.js");
-const hashPassword = require("../helpers/hashPassword.js");
-const errorHandler = require("../middlewares/errorHandler.js");
 const CustomError = require("../Utils/CustomError.js");
 const sendEmail = require("../Utils/email.js");
 
@@ -140,7 +136,7 @@ async function verifyCode(req, res, next) {
     });
   } catch (error) {
     error = new CustomError(error.message, 500);
-    return errorHandler(error, req, res);
+    next(error);
   }
 }
 async function resetPassword(req, res, next) {
@@ -155,7 +151,7 @@ async function resetPassword(req, res, next) {
     });
     if (!account) {
       const error = new CustomError("Code is Invalid or expired", 400);
-      return errorHandler(error, req, res);
+      next(error);
     }
     account.password = req.body.password;
     account.passwordResetToken = undefined;
@@ -169,7 +165,7 @@ async function resetPassword(req, res, next) {
     return res.status(200).send(account);
   } catch (error) {
     error = new CustomError(error.message, 500);
-    return errorHandler(error, req, res);
+    next(error);
   }
 }
 

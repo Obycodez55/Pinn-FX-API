@@ -14,7 +14,6 @@ const errorHandler = require("./middlewares/errorHandler")
 
 // Connect to DB
 connectDB();
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

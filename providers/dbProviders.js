@@ -15,8 +15,17 @@ async function findAccountByEmail(email) {
 
 async function createDetails(id) {
   try {
-    const details = await AccountDetails.create({ accountId: id });
+    const details = await AccountDetails.create({ accountId: id, balance: 45000.45});
     return details._id;
+  } catch (error) {
+    throw new CustomError(error.message, 500);
+  }
+}
+
+async function getDetails(id){
+  try {
+    const details = await AccountDetails.findOne({ accountId: id });
+    return details;
   } catch (error) {
     throw new CustomError(error.message, 500);
   }
@@ -24,5 +33,6 @@ async function createDetails(id) {
 
 module.exports = {
   findAccountByEmail,
-  createDetails
+  createDetails,
+  getDetails
 };

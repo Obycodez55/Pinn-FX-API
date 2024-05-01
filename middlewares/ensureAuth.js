@@ -1,14 +1,13 @@
 const jwt = require("jsonwebtoken");
 const Account = require("../models/Account");
-const { getByEmail, findAccountByEmail } = require("../providers/dbProviders");
+const { findAccountByEmail } = require("../providers/dbProviders");
 const CustomError = require("../Utils/CustomError");
 
 module.exports = async function (req, res, next) {
   const token =
     req.body.token ||
     req.query.token ||
-    req.headers["x-access-token"] ||
-    req.cookies.token;
+    req.headers["x-access-token"];
   if (!token) {
     const error = new CustomError("Unauthorized: No token provided", 401);
     next(error);
@@ -19,7 +18,7 @@ module.exports = async function (req, res, next) {
       next(error);
     } else {
       try {
-        const account = await findAccountByEmail(Account, decoded);
+        const account = await findAccountByEmail(decoded);
         if (!account) {
           const error = new CustomError("Account does not exist", 404);
           next(error);

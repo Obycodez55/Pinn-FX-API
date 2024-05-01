@@ -1,5 +1,4 @@
 const bcrypt = require("bcryptjs");
-const Account = require("../models/Account");
 const { findAccountByEmail } = require("./dbProviders");
 
 module.exports = async (email, password) => {
@@ -9,7 +8,7 @@ try {
   if (!account) {
     throw new Error("Invalid Login Credentials" );
   }
-  const isPasswordMatch = bcrypt.compare(password, account.password);
+  const isPasswordMatch = await bcrypt.compare(password, account.password);
   if (!isPasswordMatch) {
   throw new Error("Invalid Login Credentials");
   }
