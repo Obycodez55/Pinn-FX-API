@@ -53,19 +53,13 @@ async function authenticate(req, res, next) {
 
 async function update(req, res, next) {
   const update = req.body || req.query;
-
   try {
     await Account.findByIdAndUpdate(req.account.id, update);
 
-    const account = await findAccountByEmail(Account, req.account.email);
-    if (!account) {
-      const err = new CustomError("Account not found", 404);
-      next(err);
-    }
+    const account = await findAccountByEmail(req.account.email);
     stripAccount(account);
     return res.status(200).send({ statusCode: 200, account });
   } catch (error) {
-    error = new CustomError(error.message, error.code);
     next(error);
   }
 }
@@ -140,15 +134,19 @@ async function verifyCode(req, res, next) {
   }
 }
 async function resetPassword(req, res, next) {
+  console.log(req.params.token);
   try {
-    const token = crypto
-      .createHash("sha256")
-      .update(req.params.token)
-      .digest("hex");
+    const token = crypto.createHash("sha256").update(req.params.token).digest("hex");
+    // const token = crypto
+    //   .createHash("sha256")
+    //   .update(req.params.token)
+    //   .digest("hex");
+      console.log(token);
     const account = await Account.findOne({
       passwordResetToken: token,
-      passwordResetTokenExpires: { $gt: Date.now() }
+      // passwordResetTokenExpires: { $gt: Date.now() }
     });
+    console.log(account);
     if (!account) {
       const error = new CustomError("Code is Invalid or expired", 400);
       next(error);

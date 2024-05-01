@@ -6,8 +6,11 @@ const CustomError = require("../Utils/CustomError");
 
 async function findAccountByEmail(email) {
   try {
-    const value = await Account.findOne({ email: email });
-    return value;
+    const account = await Account.findOne({ email: email });
+    if (!account) {
+     throw new CustomError("Account not found", 404);
+    }
+    return account;
   } catch (error) {
     throw new CustomError(error.message, 500);
   }

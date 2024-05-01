@@ -86,7 +86,7 @@ AccountSchema.methods.generatePasswordResetToken = function () {
 
   this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
   this.passwordResetTokenExpires = Date.now() + 15 * 60 * 1000;
-
+  console.log(resetToken, this.passwordResetToken);
   return resetToken;
 };
 

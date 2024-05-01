@@ -1,6 +1,7 @@
 const getErrorType = require("../helpers/getErrorType");
 const CustomError = require("../Utils/CustomError");
 const errorHandler = (error, req, res, next) => {
+  // console.log(error);
   if (error.code === 11000) {
     error = new CustomError(
       `Duplicate account! ${getErrorType(error)} already exists`,
