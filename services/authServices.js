@@ -48,24 +48,30 @@ async function authenticate(req, res, next) {
 
 async function update(req, res, next) {
   const update = req.body || req.query;
+  async function updateAccount() {
+    try {
+      await Account.findByIdAndUpdate(req.account.id, update);
+      const account = await Account.findById(req.account.id);
+      stripAccount(account);
+      return res.status(200).send({ statusCode: 200, account });
+    } catch (error) {
+      next(error);
+    }
+  }
   if (update.password) {
-    const err = new CustomError("Forbidden request: Can't update Password", 403);
+    const err = new CustomError(
+      "Forbidden request: Can't update Password",
+      403
+    );
     next(err);
-  }else
-  if(update.email){
+  } else if (update.email) {
     const token = getToken(update.email);
     update.token = token;
-  };
-  try {
-    await Account.findByIdAndUpdate(req.account.id, update);
-    const account = await Account.findById(req.account.id);
-    stripAccount(account);
-    return res.status(200).send({ statusCode: 200, account });
-  } catch (error) {
-    next(error);
+    updateAccount();
+  } else {
+    updateAccount();
   }
 }
-
 
 async function forgotPassword(req, res, next) {
   try {
@@ -82,7 +88,7 @@ async function forgotPassword(req, res, next) {
     const resetToken = account.generatePasswordResetToken();
     await account.save();
     const reset = new Reset_Code({ token: resetToken });
-    
+
     newreset = await reset.save();
     req.resetCode = reset.resetCode;
     // const message = `Reset Code ${reset.resetCode}`;
@@ -97,7 +103,6 @@ async function forgotPassword(req, res, next) {
         message: "Password reset link sent to the email address"
       });
     } catch (error) {
-     
       account.passwordResetToken = undefined;
       account.passwordResetTokenExpires = undefined;
       account.save();
@@ -136,9 +141,12 @@ async function verifyCode(req, res, next) {
 }
 async function resetPassword(req, res, next) {
   try {
-    const token = crypto.createHash("sha256").update(req.params.token).digest("hex");
+    const token = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
     const account = await Account.findOne({
-      passwordResetToken: token,
+      passwordResetToken: token
       // passwordResetTokenExpires: { $gt: Date.now() }
     });
     if (!account) {
@@ -163,7 +171,7 @@ async function resetPassword(req, res, next) {
 
 const test = (req, res) => {
   console.log(req.body);
-}
+};
 module.exports = {
   createAccount,
   authenticate,
