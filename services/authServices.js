@@ -59,7 +59,7 @@ async function update(req, res, next) {
 
     const account = await findAccountByEmail(Account, req.account.email);
     if (!account) {
-      const err = new CustomError("Account not found", 400);
+      const err = new CustomError("Account not found", 404);
       next(err);
     }
     stripAccount(account);
