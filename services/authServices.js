@@ -14,17 +14,12 @@ const sendEmail = require("../Utils/email.js");
 async function createAccount(req, res, next) {
   try {
     const newData = req.body || req.query;
-    // console.log({body: newData});
     const account = new Account(newData);
-    // console.log({newAccount: account});
     const token = getToken(account.email);
     const detailId = await createDetails(account.id);
-    // console.log({newAccount: account, token: token});
     account.token = token;
     account.details = detailId;
-    // console.log(account);
     const newaccount = await account.save();
-    // console.log({created: newaccount});
     stripAccount(account); // TODO: work on striping the data before sending it,,,,
     return res.status(201).send({ statusCode: 201, account });
   } catch (error) {
@@ -53,10 +48,18 @@ async function authenticate(req, res, next) {
 
 async function update(req, res, next) {
   const update = req.body || req.query;
+  if (update.password) {
+    const err = new CustomError("Forbidden request: Can't update Password", 403);
+    next(err);
+  };
   try {
     await Account.findByIdAndUpdate(req.account.id, update);
-
-    const account = await findAccountByEmail(req.account.email);
+    const account = await Account.findById(req.account.id);
+    if(update.email){
+      const token = getToken(update.email);
+      account.token = token;
+      await account.save();
+    }
     stripAccount(account);
     return res.status(200).send({ statusCode: 200, account });
   } catch (error) {
@@ -102,7 +105,6 @@ async function forgotPassword(req, res, next) {
       next(error);
     }
   } catch (error) {
-    console.log(error);
     if (error.code == 11000) {
       await Reset_Code.deleteOne({ resetCode: req.resetCode });
       forgotPassword(req, res, next);
@@ -134,19 +136,12 @@ async function verifyCode(req, res, next) {
   }
 }
 async function resetPassword(req, res, next) {
-  console.log(req.params.token);
   try {
     const token = crypto.createHash("sha256").update(req.params.token).digest("hex");
-    // const token = crypto
-    //   .createHash("sha256")
-    //   .update(req.params.token)
-    //   .digest("hex");
-      console.log(token);
     const account = await Account.findOne({
       passwordResetToken: token,
       // passwordResetTokenExpires: { $gt: Date.now() }
     });
-    console.log(account);
     if (!account) {
       const error = new CustomError("Code is Invalid or expired", 400);
       next(error);

@@ -1,7 +1,6 @@
 const AccountDetails = require("../models/Account_details");
 const Account = require("../models/Account");
 
-const crypto = require("crypto");
 const CustomError = require("../Utils/CustomError");
 
 async function findAccountByEmail(email) {
@@ -12,7 +11,8 @@ async function findAccountByEmail(email) {
     }
     return account;
   } catch (error) {
-    throw new CustomError(error.message, 500);
+    const code = error.statusCode || 500;
+    throw new CustomError(error.message, code);
   }
 }
 

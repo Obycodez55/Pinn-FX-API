@@ -34,20 +34,3 @@ module.exports = async function (req, res, next) {
       next(error);
     }
 };
-
-// module.exports = function(req, res, next){
-//     const token = req.cookies.user_token;
-
-//     if (!token) {
-//       return res.redirect("/user/login");
-//     }
-
-//     try {
-//       const decoded = jwt.verify(token, jwtSecret);
-//       req.userId = decoded.userId;
-//       next();
-//     } catch(error){
-//       console.log(error);
-//       res.redirect("/");
-//     }
-//   }
