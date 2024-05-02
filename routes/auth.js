@@ -38,6 +38,7 @@ router.post("/auth/verifyCode", (req, res, next) => {
   verifyCode(req, res, next);
 });
 router.patch("/auth/resetPassword/:token", (req, res, next) => {
+  console.log("got here");
   resetPassword(req, res, next);
 });
 router.get("/test", (req, res) => {
