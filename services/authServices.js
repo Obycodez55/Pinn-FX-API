@@ -52,12 +52,9 @@ async function authenticate(req, res, next) {
 async function update(req, res, next) {
   const update = req.body || req.query;
   async function updateAccount() {
-    console.log(req.body);
-    console.log(req.account);
     try {
       await Account.findByIdAndUpdate(req.account.id, update);
-      const account = await Account.findById(req.account.id);
-      console.log(account);
+      const account = await Account.findById(req.account.id);1
       stripAccount(account);
       return res.status(200).send({ statusCode: 200, account });
     } catch (error) {
@@ -146,6 +143,7 @@ async function verifyCode(req, res, next) {
   }
 }
 async function resetPassword(req, res, next) {
+  console.log(req.params.token);
   try {
     const token = crypto
       .createHash("sha256")
@@ -155,6 +153,7 @@ async function resetPassword(req, res, next) {
       passwordResetToken: token,
       passwordResetTokenExpires: { $gt: Date.now() }
     });
+    console.log(account);
     if (!account) {
       const error = new CustomError("Code is Invalid or expired", 400);
       next(error);

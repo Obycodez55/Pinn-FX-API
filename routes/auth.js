@@ -29,7 +29,6 @@ router.post("/auth/authenticate", (req, res, next) => {
 });
 
 router.put("/account/update", ensureAuth, (req, res, next) => {
-  console.log(req.body);
   update(req, res, next);
 });
 router.post("/auth/forgotPassword", (req, res, next) => {
