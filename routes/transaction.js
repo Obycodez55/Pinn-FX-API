@@ -3,7 +3,7 @@ const ensureAuth = require("../middlewares/ensureAuth.js");
 const errorHandler = require("../middlewares/errorHandler.js");
 const tryCatch = require("../Utils/tryCatch.js");
 
-const {test, deposit, createLinked, getLinked} = require("../services/transactionServices.js");
+const {test, deposit, withdraw, createLinked, getLinked} = require("../services/transactionServices.js");
 
 const router = express.Router();
 
@@ -15,6 +15,10 @@ router.get("/clear", (req, res, next) => {
 
 router.post("/transaction/deposit", ensureAuth, (req, res, next) => {
     tryCatch(deposit(req, res,next));
+})
+
+router.post("/transaction/withdraw", ensureAuth, (req, res, next) => {
+    tryCatch(withdraw(req, res,next));
 })
 
 router.post("/linked/create", ensureAuth, (req, res, next) => {

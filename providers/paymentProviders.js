@@ -5,7 +5,7 @@ function handleError(error) {
     error: { status: error.statusCode, message: error.message, error: error }
   };
 }
-async function depositMoney(amount, account, next) {
+async function depositMoney(amount, account) {
   try {
     if (account.blocked) {
       const error = new CustomError(
@@ -25,4 +25,22 @@ async function depositMoney(amount, account, next) {
   }
 }
 
-module.exports = { depositMoney };
+async function withdrawMoney(amount, account) {
+    try {
+      if (account.blocked) {
+        const error = new CustomError(
+          "Blocked: This account is not allowed to make transactions",
+          403
+        );
+        return handleError(error);
+      } else {
+        
+        account.balance += amount;
+      }
+    } catch (error) {
+      error = new CustomError(error.message, 500);
+      return handleError(error);
+    }
+  }
+
+module.exports = { depositMoney, withdrawMoney };

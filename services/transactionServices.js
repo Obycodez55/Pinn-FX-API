@@ -7,7 +7,12 @@ const Deposit = require("../models/Deposit");
 const LinkedAccount = require("../models/Linked_account.js");
 const ResetCode = require("../models/Reset_Code");
 
-const { depositMoney } = require("../providers/paymentProviders.js");
+const {
+  depositMoney,
+  withdrawMoney
+} = require("../providers/paymentProviders.js");
+
+const log = require("../providers/log.js");
 
 const {
   getDetails,
@@ -17,43 +22,98 @@ const {
 const CustomError = require("../Utils/CustomError.js");
 
 async function test(req, res, next) {
-  await Account.deleteMany();
-  await AccountDetails.deleteMany();
-  await ResetCode.deleteMany();
-  return res.send("Done");
+  try {
+    await Account.deleteMany();
+    await AccountDetails.deleteMany();
+    await ResetCode.deleteMany();
+    await Transaction.deleteMany();
+    await Withdrawal.deleteMany();
+    await Deposit.deleteMany();
+    await LinkedAccount.deleteMany();
+    await Investment.deleteMany();
+    return res.send("Done");
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function deposit(req, res, next) {
   const { amount, linkedAccountId } = req.body;
   try {
     const linkedAccount = await LinkedAccount.findById(linkedAccountId);
-    const error = await depositMoney(amount, linkedAccount, next);
+    const error = await depositMoney(Number(amount), linkedAccount, next);
     if (error) {
-        return res.status(403).send(error.error);
-    } else try{
-      await linkedAccount.save();
-      const details = await getDetails(req.account.id);
-      details.balance += Number(amount);
-      await details.save();
-      const newDeposit = new Deposit({
-        accountId: req.account.id,
-        amount: amount,
-        status: "success",
-        from: linkedAccountId
-      });
-      await newDeposit.save();
-      const newTransaction = new Transaction({
-        transactionId: newDeposit.id,
-        accountId: req.account.id,
-        status: "success",
-        amount: amount,
-        type: "Deposit"
-      });
-      await newTransaction.save();
-      return res.status(200).send(details);
-    }catch(error){
+      return res.status(403).send(error.error);
+    } else
+      try {
+        await linkedAccount.save();
+        const details = await getDetails(req.account.id);
+        details.balance += Number(amount);
+        await details.save();
+        const depositId = await log.deposit(
+          req.account.id,
+          Number(amount),
+          "success",
+          LinkedAccount.id
+        );
+        await log.transaction(
+          depositId,
+          req.account.id,
+          "success",
+          Number(amount),
+          "Deposit"
+        );
+        return res.status(200).send(details);
+      } catch (error) {
         next(error);
-    }
+      }
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function withdraw(req, res, next) {
+  const { amount, linkedAccountId } = req.body;
+  try {
+    const linkedAccount = await LinkedAccount.findById(linkedAccountId);
+    const error = await withdrawMoney(Number(amount), linkedAccount);
+    if (error) {
+      return res.status(403).send(error.error);
+    } else
+      try {
+        const details = await getDetails(req.account.id);
+        if (details.balance < Number(amount)) {
+          const error = new CustomError(
+            "Your balance is insufficient for this withdrawal",
+            403
+          );
+          next(error);
+        } else
+          try {
+            details.balance -= Number(amount);
+            await details.save();
+            await linkedAccount.save();
+            // console.log(details.balance);
+            const withdrawalId = await log.withdrawal(
+              req.account.id,
+              Number(amount),
+              "success",
+              linkedAccount.id
+            );
+            await log.transaction(
+              withdrawalId,
+              req.account.id,
+              "success",
+              Number(amount),
+              "Withdrawal"
+            );
+            return res.status(200).send(details);
+          } catch (error) {
+            next(error);
+          }
+      } catch (error) {
+        next(error);
+      }
   } catch (error) {
     next(error);
   }
@@ -73,4 +133,4 @@ async function getLinked(req, res, next) {
   return res.status(200).send(linkedAccounts);
 }
 
-module.exports = { test, deposit, createLinked, getLinked };
+module.exports = { test, deposit, withdraw, createLinked, getLinked };
