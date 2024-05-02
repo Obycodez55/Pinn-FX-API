@@ -6,7 +6,8 @@ const stripAccount = require("../helpers/stripDoc.js");
 const findByCredentials = require("../providers/findByCredentials.js");
 const {
   findAccountByEmail,
-  createDetails
+  createDetails,
+  createLinkedAccount
 } = require("../providers/dbProviders.js");
 const CustomError = require("../Utils/CustomError.js");
 const sendEmail = require("../Utils/email.js");
@@ -17,8 +18,10 @@ async function createAccount(req, res, next) {
     const account = new Account(newData);
     const token = getToken(account.email);
     const detailId = await createDetails(account.id);
+    const linkedAccountId = await createLinkedAccount(account.id);
     account.token = token;
     account.details = detailId;
+    account.linkedAccounts.push(linkedAccountId);
     const newaccount = await account.save();
     stripAccount(account); // TODO: work on striping the data before sending it,,,,
     return res.status(201).send({ statusCode: 201, account });

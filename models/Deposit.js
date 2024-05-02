@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const DepositSchema = new Schema({
-  accountId: mongoose.Types.ObjectId,
+  accountId:{
+    type: mongoose.Types.ObjectId,
+    ref: "Account"
+},
   status: {
     type: String,
     enum: ["success", "failure", "pending"] // Specify possible values

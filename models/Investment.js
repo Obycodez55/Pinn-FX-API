@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const InvestmentSchema = new Schema({
-    accountId: mongoose.Types.ObjectId,
+  accountId:{
+    type: mongoose.Types.ObjectId,// get: v => new mongoose.Types.Decimal128((+v.toString()).toFixed(2)),
+    ref: "Account"
+},
     status: {
       type: String,
       enum: ["success", "failure", "pending"] // Specify possible values
