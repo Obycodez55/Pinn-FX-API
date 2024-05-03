@@ -96,7 +96,7 @@ async function forgotPassword(req, res, next) {
     req.resetCode = reset.resetCode;
     // const message = `Reset Code ${reset.resetCode}`;
     try {
-      await sendEmail({
+      await sendEmail.sendPasswordResetEmail({
         email: email,
         subject: "Password reset request received",
         message: reset.resetCode

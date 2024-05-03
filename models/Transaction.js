@@ -9,7 +9,7 @@ const TransactionSchema = new Schema({
 },
   type: {
     type: String,
-    enum: ["Deposit", "Withdrawal", "Investment"]
+    enum: ["Deposit", "Withdrawal", "Investment", "Investment Return"]
   },
   status: {
     type: String,

@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "env-cmd -f ./.env nodemon app.js",
-    "start": "node app.js"
+    "start": "npm run dev"
   },
   "author": "Obycodez55",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.5.0",
     "mongoose": "^8.3.2",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.13",
     "shortid": "^2.2.16",
     "validator": "^13.11.0"

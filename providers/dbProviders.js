@@ -1,5 +1,9 @@
 const AccountDetails = require("../models/Account_details");
 const Account = require("../models/Account");
+const Withdrawal = require("../models/Withdrawal");
+const Deposit = require("../models/Deposit");
+const Investment = require("../models/Investment");
+const InvestmentReturn = require("../models/Investment_return");
 const LinkedAccount = require("../models/Linked_account");
 const Banks = require("../Utils/Banks");
 
@@ -51,9 +55,26 @@ async function getDetails(id) {
   }
 }
 
+function getTransactionModel(transaction){
+  const type = transaction.type;
+  switch (type) {
+    case "Withrawal":
+    return Withdrawal;
+  case "Deposit":
+    return Deposit
+  case "Investment":
+    return Investment
+  case "Investment Return":
+    return InvestmentReturn
+  default:
+    throw new CustomError("Invalid Transaction type", 400);
+}
+}
+
 module.exports = {
   findAccountByEmail,
   createDetails,
   getDetails,
-  createLinkedAccount
+  createLinkedAccount,
+  getTransactionModel
 };

@@ -15,23 +15,22 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-const sendEmail = async (options) => {
-  const accessToken = await oAuth2Client.getAccessToken();
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      type: "OAuth2",
-      user: "obycodez55@gmail.com",
-      clientId: CLIENT_ID,
-      clientSecret: CLIENT_SECRET,
-      refreshToken: REFRESH_TOKEN,
-      accessToken: accessToken
-    }
-  });
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    type: "OAuth2",
+    user: "obycodez55@gmail.com",
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    refreshToken: REFRESH_TOKEN
+  }
+});
 
+const sendPasswordResetEmail = async (options) => {
+  transporter.accessToken  = await oAuth2Client.getAccessToken();
   ejs.renderFile(
-    __dirname + "/../views/new-email.ejs",
+    __dirname + "/../views/password-email.ejs",
     { code: options.message },
     async (err, template) => {
       if (err) {
@@ -51,7 +50,7 @@ const sendEmail = async (options) => {
             },
             {
               filename: "logo.png",
-              path: __dirname + "/../views/images/logo.png",
+              path: __dirname + "/../views/images/logo.jpg",
               cid: "logo.png"
             },
             {
@@ -83,4 +82,59 @@ const sendEmail = async (options) => {
   );
 };
 
-module.exports = sendEmail;
+const sendInvestReturnEmail = async (options) => {
+  transporter.accessToken  = await oAuth2Client.getAccessToken();
+  ejs.renderFile(
+    __dirname + "/../views/invest-return-email.ejs",
+    { code: '' },
+    async (err, template) => {
+      if (err) {
+        console.log(err);
+      } else {
+        const emailOptions = {
+          from: "PinnFx support@pinnfx.com <obycodez55@gmail.com>",
+          to: options.email,
+          subject: options.subject,
+          text: options.message,
+          html: template
+          // attachments: [
+          //   {
+          //     filename: "header3.png",
+          //     path: __dirname + "/../views/images/header3.png",
+          //     cid: "header3.png"
+          //   },
+          //   {
+          //     filename: "logo.png",
+          //     path: __dirname + "/../views/images/logo.png",
+          //     cid: "logo.png"
+          //   },
+          //   {
+          //     filename: "facebook.png",
+          //     path: __dirname + "/../views/images/facebook2x.png",
+          //     cid: "facebook.png"
+          //   },
+          //   {
+          //     filename: "instagram.png",
+          //     path: __dirname + "/../views/images/instagram2x.png",
+          //     cid: "instagram.png"
+          //   },
+          //   {
+          //     filename: "twitter.png",
+          //     path: __dirname + "/../views/images/twitter2x.png",
+          //     cid: "twitter.png"
+          //   },
+          //   {
+          //     filename: "Beefree-logo.png",
+          //     path: __dirname + "/../views/images/Beefree-logo.png",
+          //     cid: "Beefree-logo.png"
+          //   }
+          // ]
+        };
+
+        await transporter.sendMail(emailOptions);
+      }
+    }
+  );
+};
+
+module.exports = { sendPasswordResetEmail, sendInvestReturnEmail };

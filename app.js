@@ -12,6 +12,8 @@ const TransactionRoute = require("./routes/transaction");
 const CustomError = require("./Utils/CustomError");
 const errorHandler = require("./middlewares/errorHandler");
 
+// const schedule = require("./Utils/Scheduler");
+// schedule();
 // Connect to DB
 connectDB();
 app.use(express.urlencoded({ extended: true }));
