@@ -29,9 +29,10 @@ const transporter = nodemailer.createTransport({
 
 const sendPasswordResetEmail = async (options) => {
   transporter.accessToken  = await oAuth2Client.getAccessToken();
+ 
   ejs.renderFile(
     __dirname + "/../views/password-email.ejs",
-    { code: options.message },
+   {code: options.message},
     async (err, template) => {
       if (err) {
         console.log(err);
@@ -86,7 +87,7 @@ const sendInvestReturnEmail = async (options) => {
   transporter.accessToken  = await oAuth2Client.getAccessToken();
   ejs.renderFile(
     __dirname + "/../views/invest-return-email.ejs",
-    { code: '' },
+   options.info,
     async (err, template) => {
       if (err) {
         console.log(err);
@@ -96,13 +97,13 @@ const sendInvestReturnEmail = async (options) => {
           to: options.email,
           subject: options.subject,
           text: options.message,
-          html: template
-          // attachments: [
-          //   {
-          //     filename: "header3.png",
-          //     path: __dirname + "/../views/images/header3.png",
-          //     cid: "header3.png"
-          //   },
+          html: template,
+          attachments: [
+            {
+              filename: "logo.png",
+              path: __dirname + "/../views/images/logo.jpg",
+              cid: "logo.png"
+            }]
           //   {
           //     filename: "logo.png",
           //     path: __dirname + "/../views/images/logo.png",

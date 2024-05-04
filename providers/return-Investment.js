@@ -1,7 +1,7 @@
 const Account = require("../models/Account");
 const {getDetails} = require("./dbProviders")
 
-
+const months = ["January", "February"," March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]
 const log = require("./log");
 const sendEmail = require("../Utils/email");
 
@@ -27,8 +27,14 @@ async function investmentReturn(investment) {
       const account = await Account.findById(investment.accountId);
       await sendEmail.sendInvestReturnEmail({
         email: account.email,
-        subject: "You have been paid your investment",
-        message: `${investment.interest}`
+        subject: "Notification of Investment Return Payment",
+        info: {
+          customer: account.firstName + " " + account.lastName,
+          amount: investment.interest,
+          date: new Date(),
+          asset: investment.amount,
+          month: months[investment.dateTime.getMonth() + investment.initDuration - investment.remDuration]
+        }
       });
       console.log("Sucessfully sent interest");
       return investment.remDuration;

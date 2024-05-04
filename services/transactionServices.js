@@ -198,7 +198,7 @@ async function invest(req, res, next) {
     const investment = await Investment.findById(investmentId);
     const id = investment.id;
     const day = investment.dateTime.getDate();
-    const start = investment.dateTime.getMonth() + 1;
+    const start = investment.dateTime.getMonth() + 2;
     const end = investment.endDate.getMonth();
     scheduleInvestmentReturn(day, start, end, investment);
     return res.status(200).send(details);
