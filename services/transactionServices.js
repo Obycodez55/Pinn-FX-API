@@ -169,6 +169,7 @@ async function withdrawInterest(req, res, next){
 }
 
 async function invest(req, res, next) {
+  console.log(req.body)
   const { amount, duration } = req.body;
   try {
     const details = await getDetails(req.account.id);
