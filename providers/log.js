@@ -8,13 +8,14 @@ const CustomError = require("../Utils/CustomError");
 
 const transaction = async (transactionId, accountId, status, amount, type) => {
   try {
-    await Transaction.create({
+    const newTrasaction = await Transaction.create({
       transactionId,
       accountId,
       status,
       amount,
       type
     });
+    return newTrasaction;
   } catch (error) {
     error = new CustomError(error.message, 500);
     errorHandler(error);
@@ -29,7 +30,7 @@ const deposit = async (accountId, amount, status, from) => {
       status,
       from
     });
-    return newDeposit.id;
+    return newDeposit;
   } catch (error) {
     error = new CustomError(error.message, 500);
     errorHandler(error);
@@ -43,7 +44,7 @@ const withdrawal = async (accountId, amount, status, to) => {
       status,
       to
     });
-    return newWithdrawal.id;
+    return newWithdrawal;
   } catch (error) {
     error = new CustomError(error.message, 500);
     errorHandler(error);
@@ -58,7 +59,7 @@ const investment = async (accountId, amount, status, initDuration) => {
       status,
       initDuration
     });
-    return newInvestment.id;
+    return newInvestment;
   } catch (error) {
     error = new CustomError(error.message, 500);
     errorHandler(error);

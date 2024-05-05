@@ -54,20 +54,20 @@ async function deposit(req, res, next) {
         const details = await getDetails(req.account.id);
         details.balance += Number(amount);
         await details.save();
-        const depositId = await log.deposit(
+        const deposit = await log.deposit(
           req.account.id,
           Number(amount),
           "success",
           LinkedAccount.id
         );
-        await log.transaction(
-          depositId,
+        const transaction = await log.transaction(
+          deposit.id,
           req.account.id,
           "success",
           Number(amount),
           "Deposit"
         );
-        return res.status(200).send(details);
+        return res.status(200).send({transaction, deposit, details});
       } catch (error) {
         next(error);
       }
@@ -141,20 +141,20 @@ async function withdraw(req, res, next) {
     details.balance -= Number(amount);
     await details.save();
     await linkedAccount.save();
-    const withdrawalId = await log.withdrawal(
+    const withdrawal = await log.withdrawal(
       req.account.id,
       Number(amount),
       "success",
       linkedAccount.id
     );
-    await log.transaction(
-      withdrawalId,
+    const transaction = await log.transaction(
+      withdrawal.id,
       req.account.id,
       "success",
       Number(amount),
       "Withdrawal"
     );
-    return res.status(200).send(details);
+    return res.status(200).send({transaction, withdrawal, details});
   } catch (error) {
     next(error);
   }
@@ -169,7 +169,6 @@ async function withdrawInterest(req, res, next){
 }
 
 async function invest(req, res, next) {
-  console.log(req.body)
   const { amount, duration } = req.body;
   try {
     const details = await getDetails(req.account.id);
@@ -183,26 +182,25 @@ async function invest(req, res, next) {
     details.balance -= Number(amount);
     details.asset += Number(amount);
     await details.save();
-    const investmentId = await log.investment(
+    const investment = await log.investment(
       req.account.id,
       Number(amount),
       "success",
       Number(duration)
     );
-    await log.transaction(
-      investmentId,
+    const transaction = await log.transaction(
+      investment.id,
       req.account.id,
       "success",
       Number(amount),
       "Investment"
     );
-    const investment = await Investment.findById(investmentId);
     const id = investment.id;
     const day = investment.dateTime.getDate();
     const start = investment.dateTime.getMonth() + 2;
     const end = investment.endDate.getMonth();
     scheduleInvestmentReturn(day, start, end, investment);
-    return res.status(200).send(details);
+    return res.status(200).send({transaction, investment, details});
   } catch (error) {
     next(error);
   }
