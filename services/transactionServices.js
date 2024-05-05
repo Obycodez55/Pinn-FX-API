@@ -234,6 +234,24 @@ async function getLinked(req, res, next) {
   });
   return res.status(200).send(linkedAccounts);
 }
+async function getDeposit(req, res, next) {
+  const deposits = await Deposit.find({
+    accountId: req.account.id
+  });
+  return res.status(200).send(deposits);
+}
+async function getWithdrawal(req, res, next) {
+  const withdrawals = await Withdrawal.find({
+    accountId: req.account.id
+  });
+  return res.status(200).send(withdrawals);
+}
+async function getInvestment(req, res, next) {
+  const investments = await Investment.find({
+    accountId: req.account.id
+  });
+  return res.status(200).send(investments);
+}
 
 module.exports = {
   test,
@@ -244,5 +262,8 @@ module.exports = {
   invest,
   history,
   getTransaction,
-  withdrawInterest
+  withdrawInterest,
+  getDeposit,
+  getWithdrawal,
+  getInvestment
 };
